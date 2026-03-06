@@ -6,156 +6,217 @@
 Purpose of system: To simulate cognitive pressure 
 and encourage action through constraint. 
 Built: 27/02/2026-04/03/2026
-Version: V1 
+Refractored: 04/03/2026
+Version: V2 
 */
 
-
-int main ()
+void clariTask()
 {
-	int taskLoad = 0; 
-	int clarity = 0; 
-	char myArray[5][100];
-	int currentSize = 0; 
-	int nextAction[5] = {0};
-	int definedActions = 0;
-	
-	while(1)
-	{
-		// the multiplier of 2 for task loading was
-		// so that the tension created was moderate.  
-		int taskLoading = taskLoad *2;
-		int inp; 
-		char task; 
-		clarity = 10 - taskLoading + definedActions;
-		if (clarity < 0) clarity = 0;
-		if (clarity > 10) clarity = 10;
-		printf("taskLoad: %d | clarity: %d | definedActions: %d\n\n", taskLoad, clarity, definedActions);
+	printf("--- Hi Welcome to ClariTask ----\n");
+}
+
+void stats(int taskLoad, int clarity, int definedActions)
+{
+	printf("taskLoad: %d | clarity: %d | definedActions: %d\n\n", taskLoad, clarity, definedActions);
+}
+
+void menu()
+{
 		printf("1. Add Task\n");
 		printf("2. View Task\n");
 		printf("3. Define next action\n");
 		printf("4. Complete Task\n");
-		printf("5. Exit\n");
-		scanf("%d",&inp); 
+		printf("5. Exit\n\n");
+}
 
-		if(inp == 1)
+void taskMsg()
+{
+	printf("Write down your task: \n");
+}
+
+void inpMsg()
+{
+	printf("Enter a number between 1-5: \n");
+}
+
+void defineMsg()
+{
+	printf("Choose which task to define: \n");
+}
+
+void completeMsg()
+{
+	printf("Choose which task to complete: \n");
+}
+
+int calcClarity(int taskLoad, int definedActions)
+{
+	int clarity = 10 - (taskLoad *2) + definedActions;
+	if (clarity < 0) clarity = 0;
+	if (clarity > 10) clarity = 10;
+
+	return clarity;
+}
+
+
+void getInp(int *inp)
+{
+	scanf("%d",inp);
+}	
+
+
+void viewTask(char myArray[5][100], int currentSize)
+{
+	for (int i = 0; i < currentSize; i++)
+	{
+	// ---- presentation ----
+		printf("Task %d: %s\n", i+1 ,myArray[i]);
+	}
+}
+
+void addTask(char myArray[5][100], int *currentSize, int *taskLoad, int clarity)
+{
+	// currently messy 
+	if (*currentSize>=5)
+	{
+		printf("Task lim reached!\n");
+		return;
+	}
+	// a  forgiving threshold that forces the user to define 
+	// or complete sturs me to action	
+	if (clarity < 3) 
+	{
+		printf("Too many tasks. Define or Complete something!\n");
+		return;
+	}
+	// ---- (Presentaion) ----
+	taskMsg();
+	// ---- (input hadling) ---
+	scanf(" %99[^\n]",myArray[*currentSize]);
+	(*currentSize)++;
+	// ---- System ----
+	(*taskLoad)++;
+}
+
+
+void defineTask(char myArray[5][100], int currentSize, int nextAction[5], int *definedActions)
+{
+	// currently messy 
+	if (currentSize <= 0)
+	{
+	// ---- presentation ----
+		printf("Add some items onto the list!\n");
+		printf("current size: %d\n", currentSize);
+		return;
+	}
+	int flag; 
+	for (int j = 0; j < currentSize; j++)
+	{
+		printf("%d:%s\n",j+1,myArray[j]);
+	}
+	defineMsg();
+	scanf("%d",&flag);
+	flag = flag - 1; 
+	if (flag >= 0 && flag < currentSize)
+	{
+		if (nextAction[flag] == 0)
 		{
-			if (currentSize>=5)
-				{
-					printf("Task lim reached!\n");
-					continue; 
-				}
-			// a  forgiving threshold that forces the user to define 
-			// or complete sturs me to action	
-			if (clarity < 3) 
-			{
-				printf("Too many tasks. Define or Complete something!\n");
-				continue;
-			}
-			printf("Write down your task: \n");
-			scanf(" %99[^\n]",myArray[currentSize]);
-			currentSize++;
-			taskLoad++;
-		}
-		else if (inp == 2)
-		{
-			for (int i = 0; i < currentSize; i++)
-			{
-				printf("Task %d: %s\n", i+1 ,myArray[i]);
-			}
-		}
-		else if (inp == 3)
-		{
-			if (currentSize <= 0)
-			{
-				printf("Add some items onto the list!\n");
-				printf("current size: %d\n", currentSize);
-				continue;
-			}
-
-			int flag; 
-			for (int j = 0; j < currentSize; j++)
-			{
-				printf("%d:%s\n",j+1,myArray[j]);
-			}
-			printf("Choose which task to define: \n");
-			scanf("%d",&flag);
-
-			flag = flag - 1; 
-
-			if (flag >= 0 && flag < currentSize)
-			{
-				if (nextAction[flag] == 0)
-				{
-					nextAction[flag]=1;
-				    printf("Task '%s' marked as deifned!. \n", myArray[flag]);
-				    definedActions++;
-				}
-				else
-				{
-					printf("Task already defined!\n");
-					continue;
-				}
-			}
-			else
-			{
-				printf("Invalid Action, Try again!\n");
-
-			}
-
-		}
-		else if (inp == 4)
-		{
-			if (currentSize == 0)
-			{
-				printf("No task to complete!\n");
-				continue;
-			}
-
-			for (int k = 0; k < currentSize; k++)
-			{
-				printf("%d: %s\n", k+1, myArray[k]);
-			}
-
-			printf("Choose which task to complete: \n");
-			int flag2; 
-			scanf("%d",&flag2); 
-
-			flag2 = flag2 - 1; 
-
-			if (flag2 >= 0 && flag2 < currentSize)
-			{
-				printf("Completing '%s'\n", myArray[flag2]);
-				if (nextAction[flag2] == 1)
-				{
-				    definedActions--;
-				}
-			}
-
-			for (int l = flag2; l < currentSize - 1; l++)
-			{
-				strcpy(myArray[l], myArray[l+1]);
-				nextAction[l] = nextAction[l+1];
-			}
-
-			currentSize--;
-			taskLoad--;
-
-		}
-		else if (inp == 5) 
-		{
-			printf("Closing..."); 
-			break;
+		// ---- system ----
+			nextAction[flag]=1;
+			// ---- presentation ----
+			printf("Task '%s' marked as deifned!. \n", myArray[flag]);
+			// ---- system ----
+			(*definedActions)++;
 		}
 		else
 		{
-			printf("Try again!");
-			scanf("%d",&inp); 
+			printf("Task already defined!\n");
+			return;
 		}
-		// 
-		clarity = 10 - taskLoading + definedActions;
-		if (clarity < 0) clarity = 0;
-		if (clarity > 10) clarity = 10;
-		printf("taskLoad: %d | clarity: %d | definedActions: %d\n\n", taskLoad, clarity, definedActions);
 	}
+	else
+	{
+		printf("Invalid Action, Try again!\n");
+	}
+}
 
+void completeTask(char myArray[5][100], int *currentSize, int nextAction[5], int *definedActions, int *taskLoad)
+{
+	if (*currentSize == 0)
+	{
+		printf("No task to complete!\n");
+		return;
+	}
+	for (int k = 0; k < *currentSize; k++)
+	{
+		printf("%d: %s\n", k+1, myArray[k]);
+	}
+	
+	int flag2;
+	completeMsg(); 
+	scanf("%d",&flag2); 
+	flag2 = flag2 - 1; 
+	if (flag2 >= 0 && flag2 < *currentSize)
+	{
+		printf("Completing '%s'\n", myArray[flag2]);
+		if (nextAction[flag2] == 1)
+		{
+			*(definedActions)--;
+		}
+		for (int l = flag2; l < *currentSize - 1; l++)
+		{
+			strcpy(myArray[l], myArray[l+1]);
+			nextAction[l] = nextAction[l+1];
+		}
+		(*currentSize)--;
+		(*taskLoad)--;
+	}
+}
+
+int main ()
+{
+	int taskLoad = 0; 
+	char myArray[5][100];
+	int currentSize = 0;
+	int nextAction[5] = {0};
+	int definedActions = 0;
+	int clarity;
+	
+	clariTask();
+	while(1)
+	{
+		clarity = calcClarity(taskLoad, definedActions);
+		int inp;  
+		// ---- printing the stats (Presentaion) ---- 
+		stats(taskLoad,clarity,definedActions);
+		
+		// ---- printing the menu (Presentaion) ----
+		menu();
+		inpMsg();
+		// ---- handle input (input hadling) ----
+		getInp(&inp);  
+		// ---- task logic ----
+		switch(inp)
+		{
+		case 1:
+			addTask(myArray,&currentSize,&taskLoad,clarity);
+			break;
+		case 2:
+			viewTask(myArray,currentSize);
+			break;
+		case 3:
+			defineTask(myArray,currentSize,nextAction,&definedActions);
+			break;
+		case 4:
+			completeTask(myArray,&currentSize,nextAction,&definedActions,&taskLoad);
+			break;
+		case 5:
+			printf("Closing..."); 
+			return 0;
+		default:
+			printf("Try again!");
+			getInp(&inp); 
+			break;
+		}		
+	}
 }
